@@ -1,0 +1,61 @@
+3
+
+     
+ 
+
+ 
+
+CS-390
+
+ 
+
+Fundamental Programming Practices
+
+Student Id. 33 l $2
+
+Name.
+
+Final Exam
+
+ras
+
+ 
+ 
+ 
+ 
+ 
+
+‘Max. Marks 100 Duration-2:00 hrs:
+Part -A
+
+Please read the questions carefully before answering. Write Neatly!
+
+For Questions 1 10 3 you ean also write statement in support of your answer.
+
+4. Mobile Communication company ABC wants to store customer profile including Customer name and
+Moblie number They want to access numbers based on the priority. Help the company 1 select suitable
+data structure. 3 pts
+
+1.BST
+
+2.Queue
+3,Priority Queue
+
+\YfashMap
+
+2.A leading online shopping web site wants to keep record of its customers based on their sales record.
+Suggest suitable Data structure. 3 pts
+
+1.BST
+
+2.Queue
+3 TreeMap ios
+
+‘4.TreeSet
+
+“company wants to suggest policies based on customer's requirements. Suggest a suitable
+3pts
+
+ants to keep records of the students. The university is interested in
+tion and deletion of student records. 3pts
+
