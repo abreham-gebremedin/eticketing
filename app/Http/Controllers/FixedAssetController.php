@@ -338,6 +338,8 @@ class FixedAssetController extends Controller
                     ->withProperties([
                         'old' => $originalData,
                         'new' => $commonAttributes,
+                        'warehouse_id' => $lims_fixed_asset_data->warehouse_id,
+
                   
                      ])
                      ->tap(function ($activity) {
@@ -550,7 +552,9 @@ class FixedAssetController extends Controller
             activity()
                 ->performedOn($lims_fixed_asset_data)
                 ->causedBy(Auth::user())
-                ->withProperties(['old' => $lims_fixed_asset_data])
+                ->withProperties(['old' => $lims_fixed_asset_data,
+                'warehouse_id' => $lims_fixed_asset_data->warehouse_id,
+                ])
                 ->tap(function ($activity) {
                     $activity->is_active = true; // Set the value of the `is_active` column
                     $activity->status = AccountTransaction::STATUS_DRAFT; // Set the value of the `is_active` column
@@ -608,7 +612,8 @@ class FixedAssetController extends Controller
             activity()
                 ->performedOn($lims_fixed_asset_data)
                 ->causedBy(Auth::user())
-                ->withProperties(['old' => $lims_fixed_asset_data])
+                ->withProperties(['old' => $lims_fixed_asset_data,
+                 ])
                 ->tap(function ($activity) {
                     $activity->is_active = false; // Set the value of the `is_active` column
                       $activity->is_root = 1; // Set the value of the `is_active` column
@@ -1447,6 +1452,8 @@ class FixedAssetController extends Controller
                     'old' => $originalData,
                     'new' => $commonAttributes,
                     'data' => $data,
+                    'warehouse_id' => $lims_payment_data->warehouse_id,
+
               
                  ])
                  ->tap(function ($activity) {

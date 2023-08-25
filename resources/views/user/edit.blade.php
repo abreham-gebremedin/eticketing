@@ -68,7 +68,10 @@
                                         <label><strong>{{trans('file.Role')}} *</strong></label>
                                         <input type="hidden" name="role_id_hidden" value="{{$lims_user_data->role_id}}">
                                         <select name="role_id" required class="selectpicker form-control" data-live-search="true" data-live-search-style="begins" title="Select Role...">
-                                          @foreach($lims_role_list as $role)
+                                        @foreach($lims_role_list as $role)
+                                          @if(\Auth::user()->role_id >= 2 && $role->id==1)
+                                          @continue
+                                          @endif
                                               <option value="{{$role->id}}">{{$role->name}}</option>
                                           @endforeach
                                         </select>

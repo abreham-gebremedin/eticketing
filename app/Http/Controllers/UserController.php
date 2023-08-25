@@ -28,7 +28,18 @@ class UserController extends Controller
             $permissions = Role::findByName($role->name)->permissions;
             foreach ($permissions as $permission)
                 $all_permission[] = $permission->name;
-            $lims_user_list = User::where('is_deleted', false)->get();
+
+            if (Auth::user()->role_id >= 2) {
+                 $lims_user_list = User::where('is_deleted', false)->where('warehouse_id',Auth::user()->warehouse_id)->get();
+
+            }else {
+                # code...
+                 $lims_user_list = User::where('is_deleted', false)->get();
+
+               
+            }
+
+
             return view('user.index', compact('lims_user_list', 'all_permission'));
         }
         else
@@ -41,7 +52,10 @@ class UserController extends Controller
         if($role->hasPermissionTo('users-add')){
             $lims_role_list = Roles::where('is_active', true)->get();
             $lims_biller_list = Biller::where('is_active', true)->get();
+
+            
             $lims_warehouse_list = Warehouse::where('is_active', true)->get();
+
             $lims_customer_group_list = CustomerGroup::where('is_active', true)->get();
             return view('user.create', compact('lims_role_list', 'lims_biller_list', 'lims_warehouse_list', 'lims_customer_group_list'));
         }

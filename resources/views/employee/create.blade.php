@@ -116,9 +116,9 @@
                                             @endforeach
                                         </select>
                                     </div>
-                                    <div class="form-group" id="warehouse">
-                                        <label>{{trans('file.Warehouse')}} *</label>
-                                        <select name="warehouse_id" class="selectpicker form-control" data-live-search="true" data-live-search-style="begins" title="Select Warehouse...">
+                                    <div class="form-group @if(\Auth::user()->role_id >= 2){{'d-none'}}@endif" id="warehouse">
+                                    <label><strong>Bus Station *</strong></label>
+                                        <select name="warehouse_id" class="selectpicker form-control" data-live-search="true" data-live-search-style="begins" title="Select Bus Station...">
                                             @foreach($lims_warehouse_list as $warehouse)
                                             <option value="{{$warehouse->id}}">{{$warehouse->name}}</option>
                                             @endforeach
@@ -178,11 +178,11 @@
     });
 
     $('select[name="role_id"]').on('change', function() {
-        if($(this).val() > 2){
+        if($(this).val() >= 2){
             $('#warehouse').show(400);
-            $('#biller').show(400);
+            $('#biller').hide(400);
             $('select[name="warehouse_id"]').prop('required',true);
-            $('select[name="biller_id"]').prop('required',true);
+            $('select[name="biller_id"]').prop('required',false);
         }
         else{
             $('#warehouse').hide(400);

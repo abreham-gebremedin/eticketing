@@ -21,9 +21,6 @@ class TicketController extends Controller
         //
         $routes = Route::with(['departureCity', 'arrivalCity'])
         ->where('TicketOfficerID', Auth::user()->id)->get();
-
-        
-
         return view('bus.ticketing', compact('routes'));
     }
   
@@ -42,7 +39,7 @@ private function fetchBusDetailsFromDatabase($routeId)
     // Find the bus with the smallest Position in the queue that is not departed and created today
     $bus = Queue::where('RouteID', $routeId)
         ->where('IsDeparted', 0)
-        ->whereDate('created_at','=', date('Y-m-d'))
+        ->whereDate('created_at', date('Y-m-d'))
         ->orderBy('Position')
         ->first();
 
@@ -125,7 +122,15 @@ public function generateTicket(Request $request)
 
     try {
         DB::beginTransaction();
-        $generalSetting = GeneralSetting::find(1);
+         if (Auth::user()->role_id >= 2) {
+            $generalSetting = GeneralSetting::where('warehouse_id',Auth::user()->warehouse_id)->first();
+
+       }else {
+           # code...
+           $generalSetting = GeneralSetting::findorfail(1);
+
+          
+       }
 
         // Fetch the necessary data based on QueueID and SeatNumber
         $queue = Queue::find($queueId);
@@ -134,7 +139,6 @@ public function generateTicket(Request $request)
 
         // Calculate commission fee (3% of TicketPrice)
         $commissionFee = $route->TicketPrice * ($generalSetting->one_share_value/100);
-        
         // Create a new ticket and invoice
         $ticket = Ticket::create([
             'BusID' => $queue->BusID,
@@ -143,6 +147,8 @@ public function generateTicket(Request $request)
             'SeatNumber' => $seatNumber,
             'TicketPrice' => $route->TicketPrice,
             'CommissionFee' => $commissionFee,
+            'warehouse_id' => $queue->warehouse_id, 
+            'QueueID' => $queue->id,
             'Total' => $route->TicketPrice + $commissionFee,
         ]);
 

@@ -20,14 +20,16 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label>{{trans('file.System Title')}} *</label>
-                                        <input type="text" name="site_title" class="form-control" value="@if($lims_general_setting_data){{$lims_general_setting_data->site_title}}@endif" required readonly />
+                                        <label>{{trans('file.System Title')}} </label></br>
+                                        <h2>{{$lims_general_setting_data->site_title}}</h2>
+                                        <input type="hidden" name="id"   value="@if($lims_general_setting_data){{$lims_general_setting_data->id}}@endif" />
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label>Company Name *</label>
-                                        <input type="text" name="company_name" class="form-control" value="{{$lims_general_setting_data->company_name}}" required>
+                                        <label>Company Name </label></br>
+                                         <h2>{{$lims_general_setting_data->company_name}}</h2>
+
                                     </div>
                                 </div>
 
@@ -176,14 +178,40 @@
                                     </div>
                                 </div>
                                 </div>
+
+                                <?php
+                        $lims_cities_list = DB::table('cities')->get();
+
+                        ?>
+                    <div class="col-md-6 ">
+                    <div class="form-group ">
+                                 <label><strong>Departure City *</strong></label>
+                                <select id="default_city" name="default_city" class="selectpicker form-control"  required data-live-search="true" data-live-search-style="begins" title="Select your Departure City..." required>
+                    
+                                
+                                @foreach($lims_cities_list as $city)
+                                @if($lims_general_setting_data)
+                                @if($lims_general_setting_data->default_city==$city->id)
+                                 <option value="{{$city->id}}" selected>{{$city->name}}</option>
+                                @endif
+                                @endif
+                                        <option value="{{$city->id}}">{{$city->name}}</option>
+                                    @endforeach
+                                </select>
+                         </div>
+                         </div>
+
+
+
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>{{trans('file.Developed By')}}</label>
-                                        <input type="text" name="developed_by" class="form-control" value="{{$lims_general_setting_data->developed_by}}" readonly>
-                                    </div>
+                                        <label>{{$lims_general_setting_data->developed_by}}</label>
+                                     </div>
                                 </div>
                             </div>
                             
+               
                      
                             <div class="form-group">
                                 <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">

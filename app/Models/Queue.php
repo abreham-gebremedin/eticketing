@@ -44,7 +44,7 @@ class Queue extends Model
   }
   
     protected $fillable =[
-        "BusID","RouteID", "Position",
+        "BusID","RouteID", "Position","warehouse_id"
     ];
 
 }

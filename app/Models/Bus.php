@@ -28,7 +28,7 @@ class Bus extends Model
       return $this->status === self::STATUS_DRAFT;
   }
     protected $fillable =[
-        "BusNumber", "Capacity","RouteID"
+        "BusNumber", "Capacity","RouteID","warehouse_id"
     ];
 
 

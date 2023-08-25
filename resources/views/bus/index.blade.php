@@ -93,9 +93,9 @@
                 <div class="row">
                     <div class="col-md-6 form-group">
                         <input type="hidden" name="BusID" />
-                        <label>Plate Number *</label>
-                        <input type="text" name="BusNumber" required class="form-control">
-                    </div>  
+                        <label >Plate Number *</label>
+                        <label for="BusNumber"></label>
+                     </div>  
                     
                     <div class="col-md-6 form-group">
                          <label>Capacity *</label>
@@ -106,6 +106,7 @@
                         ->join('cities as departureCity', 'routes.DepartureCity', '=', 'departureCity.id')
                         ->join('cities as arrivalCity', 'routes.ArrivalCity', '=', 'arrivalCity.id')
                         ->select('routes.*', 'departureCity.name as departureCityName', 'arrivalCity.name as arrivalCityName')
+                        ->where('warehouse_id',Auth::user()->warehouse_id)
                         ->get();
                     
                           ?>
@@ -117,6 +118,19 @@
                                 @endforeach
                             </select>
                         </div>
+                        <?php
+                        $lims_warehouse_list = DB::table('warehouses')->where('is_active', true)->get();
+
+                        ?>
+
+                        <div class="col-md-6 form-group @if(\Auth::user()->role_id >= 2){{'d-none'}}@endif">
+                                 <label><strong>Bus Station *</strong></label>
+                                <select id="warehouse_id" name="warehouse_id" class="selectpicker form-control"  data-live-search="true" data-live-search-style="begins" title="Select Bus Station...">
+                                     @foreach($lims_warehouse_list as $warehouse)
+                                        <option value="{{$warehouse->id}}">{{$warehouse->name}}</option>
+                                    @endforeach
+                                </select>
+                         </div>
                     
                      
                 </div>
@@ -158,7 +172,7 @@
     $(document).on('click', '.edit-btn', function() {
         console.log($(this).data );
         $("#editModal input[name='BusID']").val( $(this).data('id') );
-        $("#editModal input[name='BusNumber']").val( $(this).data('share') );
+        $("#editModal label[for='BusNumber']").text($(this).data('share'));
         $("#editModal input[name='Capacity']").val( $(this).data('capacity') );
         
         $('.selectpicker').selectpicker('refresh');

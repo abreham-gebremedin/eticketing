@@ -88,6 +88,9 @@
                                         <label><strong>{{trans('file.Role')}} *</strong></label>
                                         <select name="role_id" required class="selectpicker form-control" data-live-search="true" data-live-search-style="begins" title="Select Role...">
                                           @foreach($lims_role_list as $role)
+                                          @if(\Auth::user()->role_id >= 2 && $role->id==1)
+                                          @continue
+                                          @endif
                                               <option value="{{$role->id}}">{{$role->name}}</option>
                                           @endforeach
                                         </select>
@@ -126,15 +129,16 @@
                                           @endforeach
                                         </select>
                                     </div>
-                                    <div class="form-group" id="warehouseId">
-                                        <label><strong>{{trans('file.Warehouse')}} *</strong></label>
-                                        <select name="warehouse_id" required class="selectpicker form-control" data-live-search="true" data-live-search-style="begins" title="Select Warehouse...">
+                                    <div class="form-group @if(\Auth::user()->role_id >= 2){{'d-none'}}@endif" id="warehouseId">
+                                        <label><strong>Bus Station *</strong></label>
+                                        <select name="warehouse_id" required class="selectpicker form-control" data-live-search="true" data-live-search-style="begins" title="Select Bus Station...">
                                           @foreach($lims_warehouse_list as $warehouse)
                                               <option value="{{$warehouse->id}}">{{$warehouse->name}}</option>
                                           @endforeach
                                         </select>
                                     </div>
-                                </div>
+
+                                  
                             </div>
                         {!! Form::close() !!}
                     </div>
@@ -177,10 +181,10 @@
             $('select[name="warehouse_id"]').prop('required',false);
             $('select[name="biller_id"]').prop('required',false);
         }
-        else if($(this).val() > 2 && $(this).val() != 5) {
+        else if($(this).val() >= 2 && $(this).val() != 5) {
             $('select[name="warehouse_id"]').prop('required',true);
-            $('select[name="biller_id"]').prop('required',true);
-            $('#biller-id').show(300);
+            $('select[name="biller_id"]').prop('required',false);
+            $('#biller-id').hide(300);
             $('#warehouseId').show(300);
             $('.customer-section').hide(300);
             $('.customer-input').prop('required',false);

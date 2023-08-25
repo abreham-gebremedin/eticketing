@@ -104,7 +104,7 @@
                   <h4>{{date('F')}} {{date('Y')}}</h4>
                 </div>
                 <div class="pie-chart mb-2">
-                    <canvas id="transactionChart" data-color = "{{$color}}" data-color_rgba = "{{$color_rgba}}" data-revenue={{$revenue}} data-purchase={{$purchase}} data-expense={{$expense}} data-label1="{{trans('file.Purchase')}}" data-label2="{{trans('file.revenue')}}" data-label3="{{trans('file.Expense')}}" width="100" height="95"> </canvas>
+                    <canvas id="transactionChart" data-color = "{{$color}}" data-color_rgba = "{{$color_rgba}}" data-revenue={{$profit}}   data-expense={{$expense}}   data-label2="{{trans('file.revenue')}}" data-label3="{{trans('file.Expense')}}" width="100" height="95"> </canvas>
                 </div>
               </div>
             </div>
@@ -126,158 +126,10 @@
               </div>
             </div>
             @endif
-            <div class="col-md-7">
-              <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                  <h4>{{trans('file.Recent Transaction')}}</h4>
-                  <div class="right-column">
-                    <div class="badge badge-primary">{{trans('file.latest')}} 5</div>
-                  </div>
-                </div>
-                <ul class="nav nav-tabs" role="tablist">
-                  <li class="nav-item">
-                    <a class="nav-link active" href="#sale-latest" role="tab" data-toggle="tab">{{trans('file.Sale')}}</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="#purchase-latest" role="tab" data-toggle="tab">{{trans('file.Purchase')}}</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="#quotation-latest" role="tab" data-toggle="tab">{{trans('file.Quotation')}}</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="#payment-latest" role="tab" data-toggle="tab">{{trans('file.Payment')}}</a>
-                  </li>
-                </ul>
 
-                <div class="tab-content">
-                  <div role="tabpanel" class="tab-pane fade show active" id="sale-latest">
-                      <div class="table-responsive">
-                        <table class="table">
-                          <thead>
-                            <tr>
-                              <th>{{trans('file.date')}}</th>
-                              <th>{{trans('file.reference')}}</th>
-                              <th>{{trans('file.customer')}}</th>
-                              <th>{{trans('file.status')}}</th>
-                              <th>{{trans('file.grand total')}}</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            @foreach($recent_sale as $sale)
-                            <tr>
-                              <td>{{ date($general_setting->date_format, strtotime($sale->created_at->toDateString())) }}</td>
-                              <td>{{$sale->reference_no}}</td>
-                              <td>{{$sale->customer->name}}</td>
-                              @if($sale->sale_status == 1)
-                              <td><div class="badge badge-success">{{trans('file.Completed')}}</div></td>
-                              @elseif($sale->sale_status == 2)
-                              <td><div class="badge badge-danger">{{trans('file.Pending')}}</div></td>
-                              @else
-                              <td><div class="badge badge-warning">{{trans('file.Draft')}}</div></td>
-                              @endif
-                              <td>{{$sale->grand_total}}</td>
-                            </tr>
-                            @endforeach
-                          </tbody>
-                        </table>
-                      </div>
-                  </div>
-                  <div role="tabpanel" class="tab-pane fade" id="purchase-latest">
-                      <div class="table-responsive">
-                        <table class="table">
-                          <thead>
-                            <tr>
-                              <th>{{trans('file.date')}}</th>
-                              <th>{{trans('file.reference')}}</th>
-                              <th>{{trans('file.Supplier')}}</th>
-                              <th>{{trans('file.status')}}</th>
-                              <th>{{trans('file.grand total')}}</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            @foreach($recent_purchase as $purchase)
-                            <tr>
-                              <td>{{date($general_setting->date_format, strtotime($purchase->created_at->toDateString())) }}</td>
-                              <td>{{$purchase->reference_no}}</td>
-                              @if($purchase->supplier)
-                                <td>{{$purchase->supplier->name}}</td>
-                              @else
-                                <td>N/A</td>
-                              @endif
-                              @if($purchase->status == 1)
-                              <td><div class="badge badge-success">Recieved</div></td>
-                              @elseif($purchase->status == 2)
-                              <td><div class="badge badge-success">Partial</div></td>
-                              @elseif($purchase->status == 3)
-                              <td><div class="badge badge-danger">Pending</div></td>
-                              @else
-                              <td><div class="badge badge-danger">Ordered</div></td>
-                              @endif
-                              <td>{{$purchase->grand_total}}</td>
-                            </tr>
-                            @endforeach
-                          </tbody>
-                        </table>
-                      </div>
-                  </div>
-                  <div role="tabpanel" class="tab-pane fade" id="quotation-latest">
-                      <div class="table-responsive">
-                        <table class="table">
-                          <thead>
-                            <tr>
-                              <th>{{trans('file.date')}}</th>
-                              <th>{{trans('file.reference')}}</th>
-                              <th>{{trans('file.customer')}}</th>
-                              <th>{{trans('file.status')}}</th>
-                              <th>{{trans('file.grand total')}}</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            @foreach($recent_quotation as $quotation)
-                            <tr>
-                              <td>{{date($general_setting->date_format, strtotime($quotation->created_at->toDateString())) }}</td>
-                              <td>{{$quotation->reference_no}}</td>
-                              <td>{{$quotation->customer->name}}</td>
-                              @if($quotation->quotation_status == 1)
-                              <td><div class="badge badge-danger">Pending</div></td>
-                              @else
-                              <td><div class="badge badge-success">Sent</div></td>
-                              @endif
-                              <td>{{$quotation->grand_total}}</td>
-                            </tr>
-                            @endforeach
-                          </tbody>
-                        </table>
-                      </div>
-                  </div>
-                  <div role="tabpanel" class="tab-pane fade" id="payment-latest">
-                      <div class="table-responsive">
-                        <table class="table">
-                          <thead>
-                            <tr>
-                              <th>{{trans('file.date')}}</th>
-                              <th>{{trans('file.reference')}}</th>
-                              <th>{{trans('file.Amount')}}</th>
-                              <th>{{trans('file.Paid By')}}</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            @foreach($recent_payment as $payment)
-                            <tr>
-                              <td>{{date($general_setting->date_format, strtotime($payment->created_at->toDateString())) }}</td>
-                              <td>{{$payment->payment_reference}}</td>
-                              <td>{{$payment->amount}}</td>
-                              <td>{{$payment->paying_method}}</td>
-                            </tr>
-                            @endforeach
-                          </tbody>
-                        </table>
-                      </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-5">
+
+ 
+            <!-- <div class="col-md-5">
               <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                   <h4>{{trans('file.Best Seller').' '.date('F')}}</h4>
@@ -369,7 +221,7 @@
                     </table>
                   </div>
               </div>
-            </div>
+            </div> -->
           </div>
         </div>
       </section>

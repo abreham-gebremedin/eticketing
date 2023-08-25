@@ -47,9 +47,10 @@
                     <td>{{ $queue->bus->BusNumber }}</td>
                     <td>{{ $queue->route->departureCity->name }}->{{ $queue->route->arrivalCity->name }}</td>
                     <td>{{ $queue->Position }}</td>
-                    @if($queue->isDeparted==1)
+                    @if($queue->IsDeparted==1)
                     <td>Yes</td>
-                    @else
+                    @endif
+                    @if($queue->IsDeparted==0)
                     <td>No</td>
                     @endif
 

@@ -1093,11 +1093,11 @@
                 <a href="{{route('report.productExpiry')}}">{{trans('file.Product Expiry Report')}}</a>
                 </li>
                 @endif
-                @if($product_qty_alert_active)
+                <!-- @if($product_qty_alert_active)
                 <li id="qtyAlert-report-menu">
                 <a href="{{route('report.qtyAlert')}}">{{trans('file.Product Quantity Alert')}}</a>
                 </li>
-                @endif
+                @endif -->
                 @if($dso_report_active)
                 <li id="daily-sale-objective-menu">
                     <a href="{{route('report.dailySaleObjective')}}">{{trans('file.Daily Sale Objective Report')}}</a>
@@ -1260,7 +1260,7 @@
                                 ['role_id', $role->id]
                         ])->first();
                     ?>
-                    @if($role->id <= 2)
+                    @if($role->id < 2)
                     <li id="role-menu"><a href="{{route('role.index')}}">{{trans('file.Role Permission')}}</a></li>
                     @endif
                     @if($discount_plan_permission_active)
@@ -1324,9 +1324,7 @@
                     @endif
                 </ul>
             </li>
-            @if(Auth::user()->role_id != 5)
-            <li><a target="_blank" href="{{url('public/read_me')}}"> <i class="dripicons-information"></i><span>{{trans('file.Documentation')}}</span></a></li>
-            @endif
+        
         </ul>
       </nav>
 
@@ -1357,12 +1355,21 @@
 
 
             <?php
-            
-            $lims_activity_log_list_count=0;
-            $lims_activity_log_list = DB::table('activity_log')
-            ->where('is_active', true)                
-            ->where('is_root', true)
-            ->get();
+                  $lims_activity_log_list_count=0;
+
+                    if(Auth::user()->role_id >= 2)
+                    $lims_activity_log_list = DB::table('activity_log')
+                    ->where('is_active', 1)
+                    ->where('is_root', 1)
+                    ->whereJsonContains('properties->warehouse_id', Auth::user()->warehouse_id)
+                    ->get();
+                
+                    if(Auth::user()->role_id ==1)
+                    $lims_activity_log_list = DB::table('activity_log')
+                     ->where('is_active', 1)                
+                     ->where('is_root', 1)
+                     ->get();            
+
             if($lims_activity_log_list){
                 $lims_activity_log_list_count=$lims_activity_log_list->count();
 
@@ -1569,7 +1576,7 @@
                     {!! Form::open(['route' => 'expenses.store', 'method' => 'post']) !!}
                     <?php
                       $lims_expense_category_list = DB::table('chartof_accounts')->where('chartof_account_categories_id', 5)->get();
-                      if(Auth::user()->role_id > 2)
+                      if(Auth::user()->role_id >= 2)
                         $lims_warehouse_list = DB::table('warehouses')->where([
                           ['is_active', true],
                           ['id', Auth::user()->warehouse_id]
@@ -1649,29 +1656,41 @@
                       <div class="row">
                         <div class="col-md-6 form-group">
                             <label>Plate Number</label>
-                            <input type="text" name="BusNumber" class="form-control" />
+                            <input type="text"required name="BusNumber" class="form-control" />
                         </div>
                          
                         <div class="col-md-6 form-group">
                             <label>Capacity</label>
-                            <input type="number" name="Capacity" class="form-control" />
+                            <input type="number" required name="Capacity" class="form-control" />
                         </div>
                         <?php
                         $lims_route_list=  DB::table('routes')
                         ->join('cities as departureCity', 'routes.DepartureCity', '=', 'departureCity.id')
                         ->join('cities as arrivalCity', 'routes.ArrivalCity', '=', 'arrivalCity.id')
                         ->select('routes.*', 'departureCity.name as departureCityName', 'arrivalCity.name as arrivalCityName')
+                        ->where('warehouse_id',Auth::user()->warehouse_id)
                         ->get();
                     
                           ?>
                         <div class="col-md-6 form-group">
                             <label>Route *</label>
-                            <select name="RouteID" class="selectpicker form-control"  data-live-search="true" data-live-search-style="begins" title="Select route...">
+                            <select name="RouteID" class="selectpicker form-control"  required data-live-search="true" data-live-search-style="begins" title="Select route...">
                                 @foreach($lims_route_list as $route)
                                 <option value="{{$route->id}}">{{$route->departureCityName}} ->{{$route->arrivalCityName}}</option>
                                 @endforeach
                             </select>
                         </div>
+
+                        
+                        <div class="col-md-6 form-group @if(\Auth::user()->role_id >= 2){{'d-none'}}@endif">
+                                 <label><strong>Bus Station *</strong></label>
+                                <select id="warehouse_id" name="warehouse_id" class="selectpicker form-control"  data-live-search="true" data-live-search-style="begins" title="Select Bus Station..." >
+                                     @foreach($lims_warehouse_list as $warehouse)
+                                        <option value="{{$warehouse->id}}">{{$warehouse->name}}</option>
+                                    @endforeach
+                                </select>
+                         </div>
+
                          
                       </div>
                       
@@ -1701,16 +1720,46 @@
                 <div class="modal-body">
                   <p class="italic"><small>{{trans('file.The field labels marked with * are required input fields')}}.</small></p>
                     {!! Form::open(['route' => 'routes1.store', 'method' => 'post']) !!}
-                     
+                    <?php
+                         if (Auth::user()->role_id >= 2) {
+                                    $lims_general_setting_data = DB::table('general_settings')->where('warehouse_id',Auth::user()->warehouse_id)->first();
+
+                            }else {
+                                # code...
+                             
+                                $lims_general_setting_data = DB::table('general_settings')->where('id', 1)->first();
+                            
+                                
+                                
+                            }
+                        ?>
                       <div class="row">
                       <div class="col-md-6 form-group">
-                            <label>Departure City *</label>
-                            <select name="DepartureCity" class="selectpicker form-control" required data-live-search="true" data-live-search-style="begins" title="Select City...">
-                                @foreach($lims_cities_list as $city)
-                                <option value="{{$city->id}}">{{$city->name}}</option>
+                        <label>Departure City *</label>
+                        <select name="DepartureCity" class="selectpicker form-control" required data-live-search="true" data-live-search-style="begins" title="Select City...">
+                            @php
+                                $selectedCityId = $lims_general_setting_data ? $lims_general_setting_data->default_city : null;
+                            @endphp
+
+                            @if ($selectedCityId)
+                                @foreach ($lims_cities_list as $city)
+                                    @if ($selectedCityId == $city->id)
+                                        <option value="{{ $city->id }}" selected>{{ $city->name }}</option>
+                                    @endif
                                 @endforeach
-                            </select>
-                        </div>
+                            @endif
+
+                            @if (!$selectedCityId)
+                                @foreach ($lims_cities_list as $city)
+                                        <option value="{{ $city->id }}" >{{ $city->name }}</option>
+                                @endforeach
+                            @endif
+
+                        </select>
+                    </div>
+
+
+
                         <div class="col-md-6 form-group">
                             <label>Arival City *</label>
                             <select name="ArrivalCity" class="selectpicker form-control" required data-live-search="true" data-live-search-style="begins" title="Select City...">
@@ -1728,7 +1777,14 @@
                             <label>Distance in KM</label>
                             <input type="number" name="DistanceKM" class="form-control" />KM
                         </div>
-                        
+                        <div class="col-md-6 form-group @if(\Auth::user()->role_id >= 2){{'d-none'}}@endif">
+                                 <label><strong>Bus Station *</strong></label>
+                                <select id="warehouse_id" name="warehouse_id" class="selectpicker form-control"  data-live-search="true" data-live-search-style="begins" title="Select Bus Station..." >
+                                     @foreach($lims_warehouse_list as $warehouse)
+                                        <option value="{{$warehouse->id}}">{{$warehouse->name}}</option>
+                                    @endforeach
+                                </select>
+                         </div>
                          
                       </div>
                       
@@ -1790,7 +1846,7 @@
                     {!! Form::open(['route' => 'fixed_asset.store', 'method' => 'post']) !!}
                     <?php
                       $lims_fixed_asset_category_list = DB::table('fixed_asset_categories')->where('is_active', true)->get();
-                      if(Auth::user()->role_id > 2)
+                      if(Auth::user()->role_id >= 2)
                         $lims_warehouse_list = DB::table('warehouses')->where([
                           ['is_active', true],
                           ['id', Auth::user()->warehouse_id]
@@ -1878,7 +1934,7 @@
                   <p class="italic"><small>{{trans('file.The field labels marked with * are required input fields')}}.</small></p>
                     {!! Form::open(['route' => 'prepaid_rent.store', 'method' => 'post']) !!}
                     <?php
-                       if(Auth::user()->role_id > 2)
+                       if(Auth::user()->role_id >= 2)
                         $lims_warehouse_list = DB::table('warehouses')->where([
                           ['is_active', true],
                           ['id', Auth::user()->warehouse_id]
@@ -1962,7 +2018,7 @@
                     {!! Form::open(['route' => 'transaction_adjustments.store', 'method' => 'post']) !!}
                     <?php
                       $lims_expense_category_list = DB::table('chartof_accounts')->get();
-                      if(Auth::user()->role_id > 2)
+                      if(Auth::user()->role_id >= 2)
                         $lims_warehouse_list = DB::table('warehouses')->where([
                           ['is_active', true],
                           ['id', Auth::user()->warehouse_id]
@@ -2398,16 +2454,28 @@
       <?php
             
             $lims_activity_log_list_count=0;
-            $lims_activity_log_list = DB::table('activity_log')
-            ->where('is_active', true)                
-            ->where('is_root', true)
-            ->get();
-            if($lims_activity_log_list){
-                $lims_activity_log_list_count=$lims_activity_log_list->count();
 
-            }
+            if(Auth::user()->role_id >= 2)
+             $lims_activity_log_list = DB::table('activity_log')
+             ->where('is_active', 1)
+             ->where('is_root', 1)
+             ->whereJsonContains('properties->warehouse_id', Auth::user()->warehouse_id)
+             ->get();
+         
+            if(Auth::user()->role_id == 1)
+             $lims_activity_log_list = DB::table('activity_log')
+             ->where('is_active', 1)                
+             ->where('is_root', 1)
+             ->get();            
 
-                          ?>
+    if($lims_activity_log_list){
+        $lims_activity_log_list_count=$lims_activity_log_list->count();
+
+    }
+            
+
+                          
+     ?>
 
 var lims_activity_log_list_count = <?php echo json_encode($lims_activity_log_list_count) ?>;
 var userid = <?php echo json_encode( Auth::id()) ?>;

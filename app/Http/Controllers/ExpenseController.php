@@ -304,6 +304,8 @@ class ExpenseController extends Controller
                     ->withProperties([
                         'old' => $originalData,
                         'new' => $newData,
+                        'warehouse_id' => $lims_expense_data->warehouse_id,
+
                   
                      ])
                      ->tap(function ($activity) {

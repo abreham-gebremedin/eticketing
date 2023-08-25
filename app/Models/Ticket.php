@@ -9,7 +9,7 @@ class Ticket extends Model
 {
     use HasFactory;
     protected $fillable =[
-        "BusID","RouteID","TicketOfficerID","SeatNumber","TicketPrice","CommissionFee","Total"
+        "BusID","RouteID","TicketOfficerID","SeatNumber","TicketPrice","CommissionFee","Total","warehouse_id","QueueID"
     ];
     
 }

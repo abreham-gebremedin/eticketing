@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use DB;
+use Exception;
 use Illuminate\Http\Request;
 use App\Warehouse;
 use Illuminate\Validation\Rule;
 use Keygen;
+use App\GeneralSetting;
+
 
 class WarehouseController extends Controller
 {
@@ -16,21 +20,46 @@ class WarehouseController extends Controller
         return view('warehouse.create', compact('lims_warehouse_all'));
     }
 
+ 
     public function store(Request $request)
     {
         $this->validate($request, [
             'name' => [
                 'max:255',
-                    Rule::unique('warehouses')->where(function ($query) {
+                Rule::unique('warehouses')->where(function ($query) {
                     return $query->where('is_active', 1);
                 }),
             ],
         ]);
-        $input = $request->all();
-        $input['is_active'] = true;
-        Warehouse::create($input);
-        return redirect('warehouse')->with('message', 'Data inserted successfully');
+    
+        try {
+            DB::beginTransaction();
+    
+            $input = $request->all();
+            $input['is_active'] = true;
+            $warehouse = Warehouse::create($input);
+    
+            $generalsetting = GeneralSetting::findOrFail(1);
+    
+            // Create a new GeneralSetting based on the attributes of the existing one
+            $newGeneralSetting = GeneralSetting::create($generalsetting->toArray());
+    
+            // Modify the warehouse_id of the new GeneralSetting
+            $newGeneralSetting->warehouse_id = $warehouse->id;
+    
+            // Save the changes to the new GeneralSetting
+            $newGeneralSetting->save();
+    
+            DB::commit(); // Commit the transaction
+    
+            return redirect('warehouse')->with('message', 'Data inserted successfully');
+        } catch (Exception $e) {
+            DB::rollback(); // Rollback the transaction in case of an exception
+            return redirect('warehouse')->with('not_permitted', $e->getMessage());
+        }
     }
+    
+    
 
     public function edit($id)
     {

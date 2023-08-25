@@ -19,7 +19,7 @@
                         <div class="row">
                         <div class="col-md-6 form-group">
                             <label for="userDropdown">Select a User:</label>
-                            <select id="userDropdown" name="TicketOfficerID" class="selectpicker form-control" required data-live-search="true" data-live-search-style="begins" title="Select Bus...">
+                            <select id="userDropdown" name="TicketOfficerID" class="selectpicker form-control" required data-live-search="true" data-live-search-style="begins" title="Select User...">
                                 @foreach($lims_user_list as $user)
                                     <option value="{{ $user->id }}">{{ $user->name }}</option>
                                 @endforeach
@@ -32,7 +32,7 @@
                     <div class="row">
                         <div class="col-md-6 form-group">
                              @csrf
-                            <input type="hidden" name="route_id" value="{{$routeId}}">
+                            <input type="hidden" name="id" value="{{$routeId}}">
 
                                 <button type="submit"  class="button form-control">Submit</button>
                         </div>

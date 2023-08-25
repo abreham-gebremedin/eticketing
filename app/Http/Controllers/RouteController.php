@@ -25,7 +25,19 @@ class RouteController extends Controller
                 $all_permission[] = $permission->name;
             if (empty($all_permission))
                 $all_permission[] = 'dummy text';
-            $lims_routes_all = Route::with(['departureCity', 'arrivalCity', 'user'])->get();
+
+                if (Auth::user()->role_id >= 2) {
+                   
+                   $lims_routes_all = Route::with(['departureCity', 'arrivalCity', 'user'])
+                   ->where('warehouse_id',Auth::user()->warehouse_id)
+                   ->get();
+
+               }else {
+                   # code...
+                   $lims_routes_all = Route::with(['departureCity', 'arrivalCity', 'user'])->get();
+       
+                  
+               }
             $lims_account_list = Account::where('is_active', true)->get();
     
             return view('bus.routes', compact('lims_routes_all', 'all_permission', 'lims_account_list'));
@@ -51,17 +63,20 @@ class RouteController extends Controller
         } else {
             $data['created_at'] = date("Y-m-d H:i:s");
         }
+        if (!isset($data['warehouse_id'])) {
+            $data['warehouse_id'] = Auth::user()->warehouse_id;
+        }
 
         // Validate unique ArrivalCity before creating the record
         $validator = Validator::make($data, [
             'DepartureCity' => 'required',
-            'ArrivalCity' => 'required|unique:routes',
+            'ArrivalCity' => 'required|unique:routes,ArrivalCity,NULL,id,warehouse_id,' . $data['warehouse_id'],
             'DistanceKM' => 'required',
             'TicketPrice' => 'required',
         ]);
         
         if ($validator->fails()) {
-            return redirect('routes1')->with('not_permitted', 'Validation error.')->withErrors($validator)->withInput();
+            return redirect('routes1')->with('not_permitted', 'Validation error '.$validator->errors() );
         }
 
         $lims_route_data = Route::create($data);
@@ -99,7 +114,10 @@ class RouteController extends Controller
         try {
             DB::beginTransaction();
             $data = $request->all();
-            $lims_route_data = Route::where('id', $data['route_id'])->lockForUpdate()->firstOrFail();
+            if (!isset($data['warehouse_id'])) {
+                $data['warehouse_id'] = Auth::user()->warehouse_id;
+            }
+            $lims_route_data = Route::where('id', $data['id'])->lockForUpdate()->firstOrFail();
              // Check if the lims_route_data is a draft or approved
             if ($lims_route_data->isDraft()) {
                 throw new Exception('route is waiting for Approval or rejection, you can not double update untill the Approval process is done!!');
@@ -133,14 +151,15 @@ class RouteController extends Controller
                     ->withProperties([
                         'old' => $originalData,
                         'new' => $newData,
+                        'warehouse_id' => $lims_route_data->warehouse_id,
                   
                      ])
-                     ->tap(function ($activity) {
-                        $activity->is_active = true; // Set the value of the `is_active` column
+                     ->tap(function ($activity,$lims_route_data) {
+                         $activity->is_active = true; // Set the value of the `is_active` column
                         $activity->status = Route::STATUS_DRAFT; // Set the value of the `is_active` column
                         $activity->url = "routes1"; // Set the value of the `is_active` column
                         $activity->is_root = 1; // Set the value of the `is_active` column
-
+ 
                     })
                     
                     ->log('route status updated');

@@ -52,11 +52,14 @@
               <div id="seatButtons"></div>
 
             </div>
-
-            <div id="nobusDetails" style="display: none;">
+ 
+            <div id="nobusDetails" style="display:none ;">
                
-              <p id="nobusInfo"></p>
+              <p id="nobusInfo">.....</p>
              </div>
+             </div>
+
+
             <div id="printableInvoice" style="display: none;">
                 <!-- Content of printable invoice -->
                 <div>
@@ -99,7 +102,7 @@
                 table.className = 'table';
 
                 let row = document.createElement('tr');
-
+                if(data.seats && data.seats.length>0) {
                 data.seats.forEach((seat, index) => {
                     if (index > 0 && index % 7 === 0) {
                         // Create a new row after every 7 cells
@@ -114,7 +117,7 @@
                     seatButton.id = `seatButton_${seat.seatNumber}`; // Set a unique id for each button
 
                     // Disable the seat button if it's not active
-                    if (!seat.isActive) {
+                    if (seat.isActive==0) {
                         seatButton.disabled = true;
                     }
 
@@ -131,7 +134,13 @@
 
                     cell.appendChild(seatButton);
                     row.appendChild(cell);
-                });
+                }
+                )}else{
+                busDetails.style.display = 'none';
+                nobusDetails.style.display = 'block';          
+                nobusInfo.textContent = "No bus queue data available in this route";
+
+                };
 
                 // Append the last row if it has fewer than 7 cells
                 if (row.childElementCount > 0) {
@@ -147,15 +156,11 @@
                 // Hide the bus details if no data is available
                 busDetails.style.display = 'none';
                 nobusInfo.textContent = "No bus queue data available in this route";
-                nobusDetails.style.display = 'block';            }
+                nobusDetails.style.display = 'block';          
+                }
+                 
 
-            if ( data.length === 0) {
-                busDetails.style.display = 'none';
-                nobusInfo.textContent = "No bus queue data available in this route";
-                nobusDetails.style.display = 'block';
-
-
-            }
+            
         })
         .catch(error => {
             console.error('Error fetching bus details:', error);
@@ -312,7 +317,7 @@ function checkSeatButton() {
     const reloadButton = document.getElementById('reloadButton');
     const seatn = document.getElementById('seatn');
     var flag =1;
-    for (let index = 1; index < seatn.value; index++) {
+    for (let index = 1; index <= seatn.value; index++) {
         const seatButton = document.getElementById(`seatButton_${index}`);
         if (!seatButton.disabled) {
             flag=0;

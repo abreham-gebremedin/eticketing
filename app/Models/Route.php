@@ -28,7 +28,7 @@ class Route extends Model
       return $this->status === self::STATUS_DRAFT;
   }
     protected $fillable =[
-        "DepartureCity",	"ArrivalCity",	"DistanceKM",	"TicketPrice",	"TicketOfficerID"
+        "DepartureCity",	"ArrivalCity",	"DistanceKM",	"TicketPrice",	"TicketOfficerID","warehouse_id"
     ];
 
     public function departureCity()

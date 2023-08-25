@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Queue;
+use App\Models\Route;
 use Auth;
 use Exception;
 use Illuminate\Http\Request;
@@ -28,8 +29,19 @@ use Spatie\Activitylog\Models\Activity;// add this line
                 $all_permission[] = $permission->name;
             if (empty($all_permission))
                 $all_permission[] = 'dummy text';
-                $queues = Queue::with(['bus', 'route'])->orderBy('created_at','DESC')
-                ->get();
+               
+
+                if (Auth::user()->role_id >= 2) {
+                     $queues = Queue::with(['bus', 'route'])->orderBy('created_at','DESC')
+                    ->where('warehouse_id',Auth::user()->warehouse_id)
+                    ->get();
+                }else {
+                    # code...
+                    $queues = Queue::with(['bus', 'route'])->orderBy('created_at','DESC')
+                    ->get();        
+                   
+                }
+                // dd($queues);
      
             return view('bus.queue', compact('queues', 'all_permission'));
         }
@@ -46,7 +58,7 @@ use Spatie\Activitylog\Models\Activity;// add this line
         
         try {
             DB::beginTransaction();
-            
+            $route = Route::find($routeId);
             // Find the maximum position value for the current day
             $maxPosition = Queue::whereDate('created_at', $currentDate)
                 ->where('RouteID', $routeId)
@@ -59,6 +71,7 @@ use Spatie\Activitylog\Models\Activity;// add this line
                 // Check if the bus with the same busId and RouteID is available in the queue
                 $isDuplicateBus = Queue::where('BusID', $busId)
                     ->where('RouteID', $routeId)
+                    ->whereDate('created_at', $currentDate)
                     ->where('isDeparted', 0)
                     ->exists();
                 
@@ -68,7 +81,8 @@ use Spatie\Activitylog\Models\Activity;// add this line
                         'BusID' => $busId,
                         'RouteID' => $routeId,
                         'Position' => $position,
-                        // Other columns...
+                        'warehouse_id' => $route->warehouse_id,
+                        
                     ]);
                     
                     // Increment the position for the next bus
@@ -132,7 +146,10 @@ use Spatie\Activitylog\Models\Activity;// add this line
             activity()
                 ->performedOn($queueData)
                 ->causedBy(Auth::user())
-                ->withProperties(['old' => $queueData])
+                ->withProperties([
+                    'old' => $queueData,
+                'warehouse_id' => $queueData->warehouse_id,
+                ])
                 ->tap(function ($activity) {
                     $activity->is_active = true;
                     $activity->status = Queue::STATUS_DRAFT;

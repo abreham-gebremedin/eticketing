@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Auth;
 use Illuminate\Http\Request;
 use App\Customer;
 use App\CustomerGroup;
@@ -40,6 +41,17 @@ class SettingController extends Controller
     public function generalSetting()
     {
         $lims_general_setting_data = GeneralSetting::latest()->first();
+
+        if (Auth::user()->role_id >= 2) {
+             $lims_general_setting_data = GeneralSetting::where('warehouse_id',Auth::user()->warehouse_id)->first();
+
+        }else {
+            # code...
+            $lims_general_setting_data = GeneralSetting::findorfail(1);
+
+           
+        }
+        
         $lims_account_list = Account::where('is_active', true)->get();
         $lims_currency_list = Currency::get();
         $zones_array = array();
@@ -75,16 +87,13 @@ class SettingController extends Controller
             $data['is_rtl'] = false;
             
 
-        $general_setting = GeneralSetting::latest()->first();
-        $general_setting->id = 1;
-        $general_setting->site_title = $data['site_title'];
-        $general_setting->company_name = $data['company_name'];
-        $general_setting->is_rtl = $data['is_rtl'];
+        $general_setting = GeneralSetting::findorfail($data['id']);
+         $general_setting->default_city = $data['default_city'];
+         $general_setting->is_rtl = $data['is_rtl'];
         $general_setting->currency = $data['currency'];
         $general_setting->currency_position = $data['currency_position'];
         $general_setting->staff_access = $data['staff_access'];
         $general_setting->date_format = $data['date_format'];
-        $general_setting->developed_by = $data['developed_by'];
         $general_setting->invoice_format = $data['invoice_format'];
         $general_setting->state = $data['state'];
         $general_setting->one_share_value = $data['one_share_value'];

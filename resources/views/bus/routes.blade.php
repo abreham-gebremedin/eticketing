@@ -115,8 +115,18 @@
                         <label>Price *</label>
                         <input type="number" name="TicketPrice" required class="form-control">
                     </div>  
-                    
-                    
+                    <?php
+                        $lims_warehouse_list = DB::table('warehouses')->where('is_active', true)->get();
+
+                        ?>
+                    <div class="col-md-6 form-group @if(\Auth::user()->role_id >= 2){{'d-none'}}@endif">
+                                 <label><strong>Bus Station *</strong></label>
+                                <select id="warehouse_id" name="warehouse_id" class="selectpicker form-control"  data-live-search="true" data-live-search-style="begins" title="Select Bus Station..." >
+                                     @foreach($lims_warehouse_list as $warehouse)
+                                        <option value="{{$warehouse->id}}">{{$warehouse->name}}</option>
+                                    @endforeach
+                                </select>
+                         </div>
 
                     
                      

@@ -145,14 +145,33 @@ class HomeController extends Controller
                     $product_cost += $purchased_amount;
                 }
             }
-            $revenue = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->where('TicketOfficerID', Auth::id())->sum('Total');
-            $profit = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->where('TicketOfficerID', Auth::id())->sum('CommissionFee');
-            $return = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->where('TicketOfficerID', Auth::id())->sum('TicketPrice');
+
+            if (Auth::user()->role_id > 2) {
+                $revenue = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->where('TicketOfficerID', Auth::id())->sum('Total');
+                $profit = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->where('TicketOfficerID', Auth::id())->sum('CommissionFee');
+                $return = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->where('TicketOfficerID', Auth::id())->sum('TicketPrice');
+                $expense = Expense::whereDate('created_at', '>=' , $start_date)->where('user_id', Auth::id())->whereDate('created_at', '<=' , $end_date)->sum('amount');
+         
+            }elseif (Auth::user()->role_id == 2) {
+                $revenue = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->where('warehouse_id', Auth::user()->warehouse_id)->sum('Total');
+                $profit = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->where('warehouse_id', Auth::user()->warehouse_id)->sum('CommissionFee');
+                $return = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->where('warehouse_id', Auth::user()->warehouse_id)->sum('TicketPrice');
+                $expense = Expense::whereDate('created_at', '>=' , $start_date)->where('warehouse_id',Auth::user()->warehouse_id)->whereDate('created_at', '<=' , $end_date)->sum('amount');
+         
+            } else {
+                # code...
+                $revenue = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('Total');
+                $profit = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('CommissionFee');
+                $return = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('TicketPrice');
+                $expense = Expense::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('amount');
+    
+               
+            }
 
 
-              $purchase_return = ReturnPurchase::whereDate('created_at', '>=' , $start_date)->where('user_id', Auth::id())->whereDate('created_at', '<=' , $end_date)->sum('grand_total');
+
+            $purchase_return = ReturnPurchase::whereDate('created_at', '>=' , $start_date)->where('user_id', Auth::id())->whereDate('created_at', '<=' , $end_date)->sum('grand_total');
              $purchase = Purchase::whereDate('created_at', '>=' , $start_date)->where('user_id', Auth::id())->whereDate('created_at', '<=' , $end_date)->sum('grand_total');
-             $expense = Expense::whereDate('created_at', '>=' , $start_date)->where('user_id', Auth::id())->whereDate('created_at', '<=' , $end_date)->sum('amount');
             $recent_sale = Sale::with('customer')->orderBy('id', 'desc')->where('user_id', Auth::id())->take(5)->get();
             $recent_purchase = Purchase::with('supplier')->orderBy('id', 'desc')->where('user_id', Auth::id())->take(5)->get();
             $recent_quotation = Quotation::with('customer')->orderBy('id', 'desc')->where('user_id', Auth::id())->take(5)->get();
@@ -226,14 +245,29 @@ class HomeController extends Controller
                 }
             }
 
-            $revenue = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('Total');
-            $profit = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('CommissionFee');
-            $return = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('TicketPrice');
-
-
+            if (Auth::user()->role_id > 2) {
+                $revenue = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->where('TicketOfficerID', Auth::id())->sum('Total');
+                $profit = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->where('TicketOfficerID', Auth::id())->sum('CommissionFee');
+                $return = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->where('TicketOfficerID', Auth::id())->sum('TicketPrice');
+                $expense = Expense::whereDate('created_at', '>=' , $start_date)->where('user_id', Auth::id())->whereDate('created_at', '<=' , $end_date)->sum('amount');
+         
+            }elseif (Auth::user()->role_id == 2) {
+                $revenue = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->where('warehouse_id', Auth::user()->warehouse_id)->sum('Total');
+                $profit = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->where('warehouse_id', Auth::user()->warehouse_id)->sum('CommissionFee');
+                $return = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->where('warehouse_id', Auth::user()->warehouse_id)->sum('TicketPrice');
+                $expense = Expense::whereDate('created_at', '>=' , $start_date)->where('warehouse_id',Auth::user()->warehouse_id)->whereDate('created_at', '<=' , $end_date)->sum('amount');
+         
+            } else {
+                # code...
+                $revenue = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('Total');
+                $profit = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('CommissionFee');
+                $return = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('TicketPrice');
+                $expense = Expense::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('amount');
+    
+               
+            }
             $purchase_return = ReturnPurchase::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('grand_total');
              $purchase = Purchase::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('grand_total');
-            $expense = Expense::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('amount');
             $recent_sale = Sale::with('customer')->orderBy('id', 'desc')->take(5)->get();
             $recent_purchase = Purchase::with('supplier')->orderBy('id', 'desc')->take(5)->get();
             $recent_quotation = Quotation::with('customer')->orderBy('id', 'desc')->take(5)->get();
@@ -402,10 +436,27 @@ class HomeController extends Controller
 
         
 
-            $revenue = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->where('TicketOfficerID', Auth::id())->sum('Total');
-            $profit = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->where('TicketOfficerID', Auth::id())->sum('CommissionFee');
-            $return = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->where('TicketOfficerID', Auth::id())->sum('TicketPrice');
-
+            if (Auth::user()->role_id > 2) {
+                $revenue = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->where('TicketOfficerID', Auth::id())->sum('Total');
+                $profit = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->where('TicketOfficerID', Auth::id())->sum('CommissionFee');
+                $return = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->where('TicketOfficerID', Auth::id())->sum('TicketPrice');
+                $expense = Expense::whereDate('created_at', '>=' , $start_date)->where('user_id', Auth::id())->whereDate('created_at', '<=' , $end_date)->sum('amount');
+         
+            }elseif (Auth::user()->role_id == 2) {
+                $revenue = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->where('warehouse_id', Auth::user()->warehouse_id)->sum('Total');
+                $profit = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->where('warehouse_id', Auth::user()->warehouse_id)->sum('CommissionFee');
+                $return = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->where('warehouse_id', Auth::user()->warehouse_id)->sum('TicketPrice');
+                $expense = Expense::whereDate('created_at', '>=' , $start_date)->where('warehouse_id',Auth::user()->warehouse_id)->whereDate('created_at', '<=' , $end_date)->sum('amount');
+         
+            } else {
+                # code...
+                $revenue = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('Total');
+                $profit = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('CommissionFee');
+                $return = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('TicketPrice');
+                $expense = Expense::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('amount');
+    
+               
+            }
 
             $data[0] = $revenue;
             $data[1] = $return;
@@ -478,10 +529,27 @@ class HomeController extends Controller
                 }
             }
 
-            $revenue = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('Total');
-            $profit = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('CommissionFee');
-            $return = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('TicketPrice');
-
+            if (Auth::user()->role_id > 2) {
+                $revenue = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->where('TicketOfficerID', Auth::id())->sum('Total');
+                $profit = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->where('TicketOfficerID', Auth::id())->sum('CommissionFee');
+                $return = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->where('TicketOfficerID', Auth::id())->sum('TicketPrice');
+                $expense = Expense::whereDate('created_at', '>=' , $start_date)->where('user_id', Auth::id())->whereDate('created_at', '<=' , $end_date)->sum('amount');
+         
+            }elseif (Auth::user()->role_id == 2) {
+                $revenue = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->where('warehouse_id', Auth::user()->warehouse_id)->sum('Total');
+                $profit = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->where('warehouse_id', Auth::user()->warehouse_id)->sum('CommissionFee');
+                $return = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->where('warehouse_id', Auth::user()->warehouse_id)->sum('TicketPrice');
+                $expense = Expense::whereDate('created_at', '>=' , $start_date)->where('warehouse_id',Auth::user()->warehouse_id)->whereDate('created_at', '<=' , $end_date)->sum('amount');
+         
+            } else {
+                # code...
+                $revenue = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('Total');
+                $profit = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('CommissionFee');
+                $return = Ticket::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('TicketPrice');
+                $expense = Expense::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('amount');
+    
+               
+            }
 
             $data[0] = $revenue;
             $data[1] = $return;
@@ -501,11 +569,32 @@ class HomeController extends Controller
                 $date = $year.'-'.$month.'-0'.$start;
             else
                 $date = $year.'-'.$month.'-'.$start;
-            $sale_generated[$start] = Ticket::whereDate('created_at', $date)->where('TicketOfficerID', Auth::id())->count();
-            $ticket_price[$start] = Ticket::whereDate('created_at', $date)->where('TicketOfficerID', Auth::id())->sum('TicketPrice');
-            $sale_grand_total[$start] = Ticket::whereDate('created_at', $date)->where('TicketOfficerID', Auth::id())->sum('Total');
-            $commission_total[$start] = Ticket::whereDate('created_at', $date)->where('TicketOfficerID', Auth::id())->sum('CommissionFee');
-                    $start++;
+                if (Auth::user()->role_id == 1) {
+                    $sale_generated[$start] = Ticket::whereDate('created_at', $date)->count();
+                    $ticket_price[$start] = Ticket::whereDate('created_at', $date)->sum('TicketPrice');
+                    $sale_grand_total[$start] = Ticket::whereDate('created_at', $date)->sum('Total');
+                    $commission_total[$start] = Ticket::whereDate('created_at', $date)->sum('CommissionFee');
+                
+ 
+                }elseif (Auth::user()->role_id == 2) {
+                    # code...
+                    $sale_generated[$start] = Ticket::whereDate('created_at', $date)->where('warehouse_id',Auth::user()->warehouse_id)->count();
+                    $ticket_price[$start] = Ticket::whereDate('created_at', $date)->where('warehouse_id',Auth::user()->warehouse_id)->sum('TicketPrice');
+                    $sale_grand_total[$start] = Ticket::whereDate('created_at', $date)->where('warehouse_id',Auth::user()->warehouse_id)->sum('Total');
+                    $commission_total[$start] = Ticket::whereDate('created_at', $date)->where('warehouse_id',Auth::user()->warehouse_id)->sum('CommissionFee');
+                
+                }else {
+                    # code...
+                    $sale_generated[$start] = Ticket::whereDate('created_at', $date)->where('TicketOfficerID', Auth::id())->count();
+                    $ticket_price[$start] = Ticket::whereDate('created_at', $date)->where('TicketOfficerID', Auth::id())->sum('TicketPrice');
+                    $sale_grand_total[$start] = Ticket::whereDate('created_at', $date)->where('TicketOfficerID', Auth::id())->sum('Total');
+                    $commission_total[$start] = Ticket::whereDate('created_at', $date)->where('TicketOfficerID', Auth::id())->sum('CommissionFee');
+                
+         
+                   
+                }
+
+            $start++;
         }
         $start_day = date('w', strtotime($year.'-'.$month.'-01')) + 1;
         $prev_year = date('Y', strtotime('-1 month', strtotime($year.'-'.$month.'-01')));
